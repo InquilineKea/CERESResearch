@@ -13,7 +13,7 @@ for i=1:MaxLag
 end
 TimeLeadCorr = fliplr(TimeLeadCorr);
 tempCorr = corr(Flux1',Flux2');
-tempRSq = RSquared(Flux1',Flux2')
+tempRSq = RSquared(Flux1',Flux2');
 
 TimeLaggedCorr = [TimeLeadCorr tempCorr TimeLagCorr];
 TimeLaggedRSq = [TimeLeadRSq tempRSq TimeLagRSq];
@@ -55,7 +55,17 @@ set(gca, 'Units','inches', 'Position',[1 1 16 8])
 set(gca,'GridLineStyle','--')
 set(gcf,'paperposition',[0 0 20 10])
 print(gcf,'-dpng','-r300',['Compare',Name1,'vs',Name2,'.png']);
+saveas(gcf,['Compare',Name1,'vs',Name2,'.fig'],'fig')
 hold off;
 
+set(gca,'linewidth',4)
+set(gca,'LineStyle','--')
+plot(MonthsBeforeAfter, TimeLaggedCorr)
+title(['Time-Lagged Corr of ', Name2, ' leading ',Name1])
+xlabel('Months of Lag')
+set(gca,'GridLineStyle','--')
+set(gcf,'paperposition',[0 0 20 10])
+print(gcf,'-dpng','-r300',['TimeLagCorr',Name1,'vs',Name2,'.png']);
+saveas(gcf,['TimeLagCorr',Name1,'vs',Name2,'.fig'],'fig')
 
 end

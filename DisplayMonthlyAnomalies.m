@@ -146,7 +146,7 @@ grid on;
 set(gcf,'Renderer','painters')
 set(gcf,'paperposition',[0 0 20 10])
 print(gcf,'-dpng','-r300',['Net',Var1,Var2,Var3,'Anomaly',num2str(k),'.png']);
-aaa
+
 % 
 %     currFrame = getframe;
 %     writeVideo(Net12MnthVid,currFrame);

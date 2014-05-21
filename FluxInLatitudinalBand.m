@@ -76,21 +76,31 @@ SH = AllFluxes.SH - mean(AllFluxes.SH);
 HemSum = AllFluxes.HemSum - mean(AllFluxes.HemSum);
 AsymmetryIndex = AllFluxes.AsymmetryIndex;
 
-[AX,H1,H2] = plotyy(1:length(NH),[NH' SH' HemSum'],1:length(NH),[HemDif'  6*AsymmetryIndex']);
-% [AX,H1,H2] = plotyy(1:length(NH),[NH' SH' HemSum'],1:length(NH),HemDif);
+if strcmp(VariableName,'Precip')
+        [AX,H1,H2] = plotyy(1:length(NH),[NH' SH' HemSum'],1:length(NH),[HemDif'  6*AsymmetryIndex']);
+else
+        [AX,H1,H2] = plotyy(1:length(NH),[NH' SH' HemSum'],1:length(NH),HemDif);
+end
 grid on;
 set(gca,'xtick',12-2-(MonthFilterSize-1):12:time)
 set(AX(2),'XTickLabel',[])
 set(gca,'XTickLabel',2000:2012)
 xlabel('Year End');
+if strcmp(VariableName,'Precip')
+set(get(AX(1),'Ylabel'),'FontSize',20,'String','Precip in Latitude Band for NH, SH') 
+set(get(AX(2),'Ylabel'),'FontSize',20,'String','NH-SH Difference in Precip','FontSize',20) 
+else
 set(get(AX(1),'Ylabel'),'FontSize',20,'String','Heat Flux in Latitude Band for NH, SH (Watts/m^2)') 
 set(get(AX(2),'Ylabel'),'FontSize',20,'String','NH-SH Difference in Total Heat Flux (Watts/m^2)','FontSize',20) 
+end
 difSD = sqrt(var(NH) + var(SH) - 2*getfield(cov(NH,SH), {1,2}));
 GlobalSD = sqrt(var(NH) + var(SH) +2*getfield(cov(NH,SH), {1,2}));
 corrcof = getfield(corrcoef(NH,SH),{1,2});
-set(legend(['NH \mu = ', num2str(NHMean)],['SH \mu = ', num2str(SHMean)] ,['Global \mu = ' num2str(GlobalMean)], ['AsymIndex'],['NH-SH \mu = ', num2str(HemDifMean)]),'Location','BestOutside')
-% set(legend(['NH \mu = ', num2str(NHMean)],['SH \mu = ', num2str(SHMean)] ,['Global \mu = ' num2str(GlobalMean)],sprintf(['NH-SH \mu = ', num2str(HemDifMean), '\n Corr = ', num2str(corrcof)])),'Location','BestOutside')
-
+if strcmp(VariableName,'Precip')
+        set(legend(['NH \mu = ', num2str(NHMean)],['SH \mu = ', num2str(SHMean)] ,['Global \mu = ' num2str(GlobalMean)], ['AsymIndex'],['NH-SH \mu = ', num2str(HemDifMean)]),'Location','BestOutside')
+else
+    set(legend(['NH \mu = ', num2str(NHMean)],['SH \mu = ', num2str(SHMean)] ,['Global \mu = ' num2str(GlobalMean)],sprintf(['NH-SH \\mu = ', num2str(HemDifMean), '\n Corr = ', num2str(corrcof)])),'Location','BestOutside')    
+end
 set(H1,'linewidth',4)
 set(H2,'LineStyle','--')
 set(H2,'linewidth',3)% to change the first line
@@ -102,6 +112,7 @@ title([num2str(LowerLat),'-',num2str(HigherLat),'deg ', num2str(MonthFilterSize)
 set(gca,'GridLineStyle','--')
 set(gcf,'paperposition',[0 0 20 10])
 print(gcf,'-dpng','-r300',[VariableName, num2str(MonthFilterSize),'MonthMA_HemisphericDifs_',num2str(LowerLat),'-',num2str(HigherLat),'.png']);
+saveas(gcf,[VariableName, num2str(MonthFilterSize),'MonthMA_HemisphericDifs_',num2str(LowerLat),'-',num2str(HigherLat),'.fig'],'fig')
 hold off;
 
 FluxFile = [VariableName, num2str(MonthFilterSize), '_MonthMA_', num2str(LowerLat), '_', num2str(HigherLat),'.txt'];

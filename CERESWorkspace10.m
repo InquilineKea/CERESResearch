@@ -76,6 +76,29 @@ MovingAvg.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}) = Moving
 end
 clear RawFlux;
 
+
+set(gca,'FontSize',20)
+plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.Net,2)),0,2),'LineWidth',3)
+hold on;
+plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.LW,2)),0,2),'LineWidth',3,'Color','r')
+plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.SW,2)),0,2),'LineWidth',3,'Color','g')
+plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.NetClear,2)),0,2),'LineWidth',3,'Color','c')
+plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.NetCloud,2)),0,2),'LineWidth',3,'Color','m')
+%std of latitudinal averaged flux over time. this is prolly preferable
+grid on;
+% set(gca,'xtick',(0.5-90:10:179.5-90))
+set(gca,'xtick',sind((0.5:10*180/180:179.5)-90))
+set(gca,'xticklabel',num2cell(-90:10:80))
+xlabel('Latitude')
+ylabel('Temporal SD')
+view(90,-90)
+set(gca,'GridLineStyle','--')
+set(gcf,'paperposition',[0 0 20 10])
+saveas(gcf,'blah.fig','fig')
+
+subplot(2,2,1)
+a = open('blah.fig')
+
 % IndicesMWA.NAM= bsxfun(@rdivide,moving_sum(MonthFilterSize, Indices.NAM .* allMonthWeights) ...
 %     ,moving_sum(MonthFilterSize,allMonthWeights)); %or Mean Lat Flux here
 
@@ -144,6 +167,7 @@ for MonthFilterSize=[3,6]
     MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).HemDif0to90,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).Global0to90,...
     MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).AsymIndex0to90] ...
       = FluxInLatitudinalBand(RawFlux.(FluxNames{i}),0,90,FluxNames{i},MonthFilterSize);
+  if i==11||i==1
     [MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).NH0to20,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).SH0to20,...
     MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).HemDif0to20,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).Global0to20,...
     MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).AsymIndex0to20] ...
@@ -152,6 +176,19 @@ for MonthFilterSize=[3,6]
     MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).HemDif20to90,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).Global20to90,...
     MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).AsymIndex20to90] ...
       = FluxInLatitudinalBand(RawFlux.(FluxNames{i}),20,90,FluxNames{i},MonthFilterSize);
+[MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).NH30to90,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).SH30to90,...
+    MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).HemDif30to90,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).Global30to90,...
+    MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).AsymIndex30to90] ...
+      = FluxInLatitudinalBand(RawFlux.(FluxNames{i}),30,90,FluxNames{i},MonthFilterSize);
+  [MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).NH15to90,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).SH15to90,...
+    MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).HemDif15to90,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).Global15to90,...
+    MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).AsymIndex15to90] ...
+      = FluxInLatitudinalBand(RawFlux.(FluxNames{i}),15,90,FluxNames{i},MonthFilterSize);
+      [MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).NH0to30,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).SH0to30,...
+    MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).HemDif0to30,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).Global0to30,...
+    MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).AsymIndex0to30] ...
+      = FluxInLatitudinalBand(RawFlux.(FluxNames{i}),0,30,FluxNames{i},MonthFilterSize);  
+  end
 %= FluxInLatitudinalBand(MovingAvg.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}),0,90,FluxNames{i},MonthFilterSize);
 %  hold on; plot(MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).AsymIndex0to90)
     for k=0:3
@@ -165,6 +202,28 @@ for MonthFilterSize=[3,6]
     end
     end
 end
+
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to30,MovingAvgTimeSeries.Window12Months.Net.HemDif30to90,'PrecipAsym0to30','NetHemDif30to90',12)
+
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14,MovingAvgTimeSeries.Window12Months.Net.HemDif30to90,'PrecipAsym0to14','NetHemDif30to90',12)
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to30,MovingAvgTimeSeries.Window12Months.Net.HemDif30to90,'PrecipAsym0to30','NetHemDif30to90',12)
+
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14,MovingAvgTimeSeries.Window12Months.Net.HemDif15to90,'PrecipAsym0to14','NetHemDif15to90',12)
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to30,MovingAvgTimeSeries.Window12Months.Net.HemDif15to90,'PrecipAsym0to30','NetHemDif15to90',12)
+
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14,MovingAvgTimeSeries.Window12Months.Net.HemDif0to90,'PrecipAsym0to14','NetHemDif0to90',12)
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to30,MovingAvgTimeSeries.Window12Months.Net.HemDif0to90,'PrecipAsym0to30','NetHemDif0to90',12)
+
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14,IndicesMvgAvg.Window12Months.NINO34,'PrecipAsym0to14','NINO34',12)
+
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to30,IndicesMvgAvg.Window12Months.NINO34,'PrecipAsym0to30','NINO34',12)
+
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to30(1:end-5),MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to30(6:end),'First','Last',12)
+
+
+PlotFluxSidebySide(sin(1:30),cos(1:30),'Sine','Cosine',12)
+
+
 
 % save('2014-04-30.mat','MovingAvgTimeSeries')
 
@@ -237,21 +296,28 @@ end
 PlotLatRSquared(MovingAvg.(['Window',num2str(MonthFilterSize),'Months']),MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).Net,FluxNames,MonthFilterSize,'Net')
 PlotLatRSquared(MovingAvg.(['Window',num2str(MonthFilterSize),'Months']),MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).Precip,FluxNames,MonthFilterSize,'Precip')
 
-[AX,H1,H2] = plotyy(1:length(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14'),MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14',...
-    1:length(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14'),MovingAvgTimeSeries.Window12Months.Net.HemDif0to14')
-legend(['Precip Asym 0-14deg'],['Net Hemdif 0-14deg'])
-grid on;
-set(gca,'xtick',12-2-(MonthFilterSize-1):12:time)
-set(AX(2),'XTickLabel',[])
-set(gca,'XTickLabel',2000:2012)
-xlabel('Year End');
-set(gca,'GridLineStyle','--')
-set(gcf,'paperposition',[0 0 20 10])
-print(gcf,'-dpng','-r300',['NetPrecipAsym0to14','.png']);
+% [AX,H1,H2] = plotyy(1:length(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14'),MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14',...
+%     1:length(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14'),MovingAvgTimeSeries.Window12Months.Net.HemDif0to14')
+% legend(['Precip Asym 0-14deg'],['Net Hemdif 0-14deg'])
+% grid on;
+% set(gca,'xtick',12-2-(MonthFilterSize-1):12:time)
+% set(AX(2),'XTickLabel',[])
+% set(gca,'XTickLabel',2000:2012)
+% xlabel('Year End');
+% set(gca,'GridLineStyle','--')
+% set(gcf,'paperposition',[0 0 20 10])
+% print(gcf,'-dpng','-r300',['NetPrecipAsym0to14','.png']);
 
 
 [NewCorr,NewRSq]= PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to20,MovingAvgTimeSeries.Window12Months.Net.HemDif20to90,'PrecipAsym0to20','NetHemDif20to90',12)
+
+[NewCorr,NewRSq]= PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to14,MovingAvgTimeSeries.Window12Months.Net.HemDif30to90,'PrecipAsym0to14','NetHemDif30to90',12)
+
+
 PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to20,MovingAvgTimeSeries.Window12Months.Net.HemDif0to20,'PrecipAsym0to20','NetHemDif0to20',12)
+
+PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to20,MovingAvgTimeSeries.Window12Months.Net.HemDif0to20,'PrecipAsym0to20','NetHemDif0to20',12)
+
 
 %negative correlation of -0.34 when precip leads Net by 6 months
 % 1:11 vs 2:12 (1 month lag)

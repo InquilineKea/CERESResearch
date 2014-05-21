@@ -51,6 +51,7 @@ colormap(lizmap)
 load geoid;
 ax = worldmap('World');setm(ax, 'Origin', [0 180 0]);land = shaperead('landareas', 'UseGeoCoords', true);geoshow(ax, land, 'FaceColor', [0.5 0.7 0.5])
 geoshow(mean(MovingAverage,3),geoidrefvec,'DisplayType','texturemap');colorbar
+view(2)
 title(['Temporal ',num2str(MonthFilterSize),' Month Running Mean of ',VariableName])
 set(gca,'GridLineStyle','--')
 set(gcf,'paperposition',[0 0 20 10])
@@ -60,6 +61,7 @@ hold off;
 
 ax = worldmap('World');setm(ax, 'Origin', [0 180 0]);land = shaperead('landareas', 'UseGeoCoords', true);geoshow(ax, land, 'FaceColor', [0.5 0.7 0.5])
 geoshow(std(MovingAverage,0,3),geoidrefvec,'DisplayType','texturemap');colorbar %flux departure; doesnt matter here
+view(2)
 title(['Temporal ',num2str(MonthFilterSize),' Month Moving Average SD of ',VariableName])
 set(gca,'GridLineStyle','--')
 set(gcf,'paperposition',[0 0 20 10])
@@ -71,6 +73,7 @@ hold off;
 
 [X,Y]=meshgrid(1:size(MovingAverage,3),sind(LatWeights(:,1)));
 contourf(X,Y,squeeze(mean(FluxDeparture,2)),30);colorbar
+view(2)
 shading flat;
 caxis([-max(max(abs(squeeze(mean(FluxDeparture,2))))) max(max(abs(squeeze(mean(FluxDeparture,2)))))])
 grid on; set(gca,'FontSize',18);set(gca,'GridLineStyle','--')
@@ -125,4 +128,5 @@ set(gca,'GridLineStyle','--')
 set(gcf,'paperposition',[0 0 20 10])
 print(gcf,'-dpng','-r300',[VariableName, num2str(MonthFilterSize) ,'Month_MA_Latitudinal_North_vs_South_Correlation','.png']);
 
+hold off;
 end
