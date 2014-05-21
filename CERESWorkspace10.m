@@ -82,8 +82,6 @@ plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.Net,2)),0,2
 hold on;
 plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.LW,2)),0,2),'LineWidth',3,'Color','r')
 plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.SW,2)),0,2),'LineWidth',3,'Color','g')
-plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.NetClear,2)),0,2),'LineWidth',3,'Color','c')
-plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.NetCloud,2)),0,2),'LineWidth',3,'Color','m')
 %std of latitudinal averaged flux over time. this is prolly preferable
 grid on;
 % set(gca,'xtick',(0.5-90:10:179.5-90))
@@ -91,10 +89,34 @@ set(gca,'xtick',sind((0.5:10*180/180:179.5)-90))
 set(gca,'xticklabel',num2cell(-90:10:80))
 xlabel('Latitude')
 ylabel('Temporal SD')
+title('Latitudinal SD of each flux (12-month MA)')
+view(90,-90)
+legend('Net','LW','SW')
+set(gca,'GridLineStyle','--')
+set(gcf,'paperposition',[0 0 20 10])
+print(gcf,'-dpng','-r300','LatVarNetLWSW.png')
+
+set(gca,'FontSize',20)
+plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.Net,2)),0,2),'LineWidth',3)
+hold on;
+plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.NetClear,2)),0,2),'LineWidth',3,'Color','c')
+plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.NetCloud,2)),0,2),'LineWidth',3,'Color','m')
+legend('Net','NetClear','NetCloud')
+grid on;
+% set(gca,'xtick',(0.5-90:10:179.5-90))
+set(gca,'xtick',sind((0.5:10*180/180:179.5)-90))
+set(gca,'xticklabel',num2cell(-90:10:80))
+title('Latitudinal SD of each flux (12-month MA)')
+xlabel('Latitude')
+ylabel('Temporal SD')
 view(90,-90)
 set(gca,'GridLineStyle','--')
 set(gcf,'paperposition',[0 0 20 10])
-saveas(gcf,'blah.fig','fig')
+legend('Net','NetClear','NetCloud')
+print(gcf,'-dpng','-r300','LatVarNetNetClearNetCloud.png')
+
+
+
 
 subplot(2,2,1)
 a = open('blah.fig')

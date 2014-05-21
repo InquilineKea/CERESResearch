@@ -1,0 +1,145 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{graphicx, subfigure}
+ \usepackage{epstopdf}
+ \usepackage[margin=0.5in]{geometry}
+
+\begin{document}
+
+The heat budget can be succinctly described as incoming shortwave radiation minus outgoing longwave radiation. 
+
+How can we characterize large-scale in the flux due to evolvable modes of variability (e.g. NAM, SAM, ENSO, snow/ice coverage)? 
+
+The Northern Hemisphere has a net radiation outflux, due to the high albedo of the Sahara Desert, and the presence of large regions of ice-covered terrain in subpolar latitudes. The Southern Hemisphere has more of a net radiation influx. While it contains Antarctica, whose albedo is very high, the albedo of Antarctica is irrelevant during half the year, when the Sun does not shine. 
+
+Why is the ITCZ in the Northern Hemisphere, when the Southern Hemisphere has more net radiation? Increased cross-equatorial ocean heat transport in the Atlantic Ocean (through the Atlantic Meridional Overturning Circulation) is large enough to overcome the effects of radiation, which then heats the NH more than the SH. 
+
+A better understanding of the spatial distribution of radiative anomalies would help improve our understanding of the dynamics. A better understanding of the dynamics will help us develop better GCMs so that they can better simulate observations such as the tropical precipitation asymmetry between NH precip and SH precip. 
+
+A change in NH-SH anomaly could have implications for the future evolution of the ITCZ due to climate change. If the ITCZ shifts further northwards, it could result in tropical rainfall changes over the Sahel.  
+
+We aim to characterize both the temporal variation of each radiative flux, and the latitudinal variation of the regression of each flux over each index.
+
+In part 2, we will discuss the influence of various large-scale modes of variability on the net radiation flux. 
+
+Why is this important? One reason is b/c some people predict a shift in the ENSO/SAM/NAM indices  as a result of climate change. If the ENSO shifts towards a more positive phase, this will mean that the net radiative forcing due to climate change will be lower than it would otherwise be. If the ENSO shifts towards a more negative phase, however, it will only increase the additional radiative forcing from climate change.
+
+Methods: We use the CERES EBAF v2.7 dataset, which ranges from March 2000 to February 2013. The CERES dataset contains data for each of the fluxes. We then construct 12-month running mean time series of these fluxes in each hemisphere.  Least-squares regression is used to calculate regression coefficients, and regions of significance were outlined with t-tests at p-value of 0.05. 
+
+\section{Part 1: Time-evolution of fluxes over time}
+
+The variance of net radiation primarily comes from two regions. (a) ice-related regions (NH ice melt regions, especially north of Alaska and east of Siberia) and SH just north of Antarctica. (b) ENSO-related regions (eastern Pacific, Indonesia, eastern Australia, central Pacific ). Add more descriptions about the particular features. Local minima over Antarctica and Sahara.  
+
+Probably should plot and discuss SW and LW individually before doing clear/cloud.  
+
+Variance in clearsky effects is evident in ice-melt regions (SWclear) and eastern central Australia. Australian feature and southern African feature are both due to SW primarily.  More detail here too.  LW clear has interesting structure, describe this (it looks very ENSO-like to me, although high latitude land also looks big).
+
+Variance in cloud forcing effects is mostly evident in stratocumulus and ITCZ regions. There is also some over regions of ice-melt (perhaps due to low clouds compensating for ice melt, although more likely due to cloud masking of sea ice changes).
+
+There is a lot of similarity between SWCF and LWCF, except that SWCF is a bit more prominent over higher latitudes.  The tropics dominate much more here because high clouds have a compensating SW and LW effect - when those clouds move, SWCF and LWCF are affected, but NetCloud isn't. 
+
+\begin{figure}[ht!]
+     \begin{center}
+%
+        \subfigure[Caption of First Figure]{%
+            \label{fig:first}
+            \includegraphics[height=1.5in]{{{Net12MnthMA_SD}}}
+        }%
+        \subfigure[Caption of Second Figure]{%
+           \label{fig:second}
+%           \includegraphics[height=1.5in]{{{Net12MnthMA_SD}}}
+           \includegraphics[height=1.5in]{{{NetClear12MnthMA_SD}}}
+        }\\ %  ------- End of the first row ----------------------%
+        \subfigure[Caption of Third Figure]{%
+            \label{fig:third}
+            \includegraphics[height=1.5in]{NetCloud12MnthMA_SD}
+        }%
+        \subfigure[Caption of Fourth Figure]{%
+            \label{fig:fourth}
+            \includegraphics[height=1.5in]{Temp12MnthMA_SD}
+        }%
+%
+    \end{center}
+    \caption{%
+        The l-o-n-g caption for all the subfigures
+        (FirstFigure through FourthFigure) goes here.
+     }%
+   \label{fig:subfigures}
+\end{figure}
+
+\section{Latitudinal Variance of Each Flux}
+
+[INSERT NEW PLOT HERE]
+
+
+\begin{figure}[ht!]
+\begin{center}
+\subfigure{\includegraphics[height=1in]{{{Net12MonthMA_HemisphericDifs_0-90}}}}
+\subfigure{\includegraphics[height=1in]{{{NetClear12MonthMA_HemisphericDifs_0-90}}}}
+\subfigure{\includegraphics[height=1in]{{{NetCloud12MonthMA_HemisphericDifs_0-90}}}}
+\subfigure{\includegraphics[height=1in]{{{SW12MonthMA_HemisphericDifs_0-90}}}}
+\subfigure{\includegraphics[height=1in]{{{LW12MonthMA_HemisphericDifs_0-90}}}}
+\end{center}
+\end{figure}
+
+
+There is more radiation that goes into the SH than into the NH. This is primarily due to LW clear effects, as the NH emits more LW clear radiation (-2) than the SH, which is partially cancelled out by the NH emitting slightly less LWCF radiation (+1) than the SH. The clear-sky OLR is larger in the NH because the NH is warmer than the SH (Kang et al 2014).  There is no clear trend in LWclear (or any flux) over the 10 year period (despite the melting of the Arctic Sea ice). The global-warming related radiative imbalance primarily exists over the SH. 	
+
+There  definitely seems to be an increasing trend in NetClear, especially in the NH. This could be due to ice melt effects, but this trend is seen at all latitudes.
+
+There were two main trends in the period: increased radiative forcing in the Arctic due to NH ice melt, and an overall trend towards a decrease in the ENSO index (though this is due to start/end point sensitivity). Overall, the NH ice melt does not seem to be significant enough in itself to affect the NH-SH radiative budget.  
+
+With the exception of the end of 2008 (a bunch of extra net tropical heat in the SH due to ENSO), there are no major radiative flux anomalies between NH and SH. There was increased ice melt in the NH (especially in 2012) but this did not seem to affect NH-SH much b/c SH net increased as much as NH net in that period.
+Most of the high-latitude variance comes from clearsky effects (particularly SW clearsky in the Arctic), while most of the low-latitude variance comes from cloud effects. There is a trend towards increased SW clearsky in the Arctic due to ice melt (and a trend towards more negative SWCF in the Arctic). Overall, the high-latitude effects don't seem to exert a significant signal in the total NH SW radiation (yet)
+
+There was extra TOA heat absorption from 2008-2009 due to La Nina conditions at the time (Trenberth et al. 2014). So there was pronounced heating of $1.5 W/m^2$ for about a year during the period (This was also associated with a slowing in the increase of ocean heat content). This increase primarily comes from the SH.
+
+\begin{verbatim}grep "Net NH vs. Global NH-SH" Net*.txt
+Net12_MonthMA_0_14.4775.txt:Net NH vs. Global NH-SH Dif Corr = 0.063093. R-Squared = 0.0039807
+Net12_MonthMA_0_20.txt:Net NH vs. Global NH-SH Dif Corr = 0.069183. R-Squared = 0.0047863
+Net12_MonthMA_0_30.txt:Net NH vs. Global NH-SH Dif Corr = 0.27915. R-Squared = 0.077924
+Net12_MonthMA_0_90.txt:Net NH vs. Global NH-SH Dif Corr = 0.30413. R-Squared = 0.092493
+Net12_MonthMA_14.4775_30.txt:Net NH vs. Global NH-SH Dif Corr = 0.41538. R-Squared = 0.17254
+Net12_MonthMA_15_90.txt:Net NH vs. Global NH-SH Dif Corr = 0.37553. R-Squared = 0.14102
+Net12_MonthMA_20_90.txt:Net NH vs. Global NH-SH Dif Corr = 0.40399. R-Squared = 0.16321
+Net12_MonthMA_30_48.5904.txt:Net NH vs. Global NH-SH Dif Corr = 0.29123. R-Squared = 0.084817
+Net12_MonthMA_30_90.txt:Net NH vs. Global NH-SH Dif Corr = 0.18644. R-Squared = 0.03476
+Net12_MonthMA_48.5904_90.txt:Net NH vs. Global NH-SH Dif Corr = -0.016076. R-Squared = 0.00025842
+
+grep "Net SH vs. Global NH-SH" Net*.txt
+Net12_MonthMA_0_14.4775.txt:Net SH vs. Global NH-SH Dif Corr = -0.52359. R-Squared = 0.27414
+Net12_MonthMA_0_20.txt:Net SH vs. Global NH-SH Dif Corr = -0.49542. R-Squared = 0.24544
+Net12_MonthMA_0_30.txt:Net SH vs. Global NH-SH Dif Corr = -0.49967. R-Squared = 0.24967
+Net12_MonthMA_0_90.txt:Net SH vs. Global NH-SH Dif Corr = -0.64767. R-Squared = 0.41947
+\textbf{Net12_MonthMA_14.4775_30.txt:Net SH vs. Global NH-SH Dif Corr = -0.39409. R-Squared = 0.15531}
+Net12_MonthMA_15_90.txt:Net SH vs. Global NH-SH Dif Corr = -0.46625. R-Squared = 0.21739
+Net12_MonthMA_20_90.txt:Net SH vs. Global NH-SH Dif Corr = -0.38829. R-Squared = 0.15077
+Net12_MonthMA_30_48.5904.txt:Net SH vs. Global NH-SH Dif Corr = -0.076106. R-Squared = 0.0057921
+Net12_MonthMA_30_90.txt:Net SH vs. Global NH-SH Dif Corr = -0.27663. R-Squared = 0.076524
+Net12_MonthMA_48.5904_90.txt:Net SH vs. Global NH-SH Dif Corr = -0.38532. R-Squared = 0.14847
+\end{verbatim}
+
+
+Mean Deviation of Monthly Radiation Over Time
+
+\begin{figure}[ht!]
+\begin{center}
+\subfigure{\includegraphics[height=1.5in]{{{Net_12Month_MA_TimeLat_Contour_}}}}
+\subfigure{\includegraphics[height=1.5in]{{{NetClear_12Month_MA_TimeLat_Contour_}}}}
+\subfigure{\includegraphics[height=1.5in]{{{NetCloud_12Month_MA_TimeLat_Contour_}}}}
+\end{center}
+\end{figure}
+
+An interesting characteristic here is the shift from negative net radiation to positive net radiation in the high arctic latitudes (70-90N). This is primarily due to positive forcing from SWclear effects (as there is more ice melting, albedo decreases and less SW is reflected). A brief period of efflux is associated with NAM/NINO, but the trend is independent of any of the indices. We can also see a positive trend in the temperature here. This is similar to observations in Hartmann et al 2013.
+
+\section{Precip}
+
+\includegraphics[height=1.5in]{{{ComparePrecipAsym0to20vsNetHemDif20to90}}}
+
+There is more precip in the NH than the SH. The theory is that precip shifts into the hemisphere with higher heating, so shifts from SH to NH heating could increase NH precip in the NH tropics. 
+This is primarily due to rainfall from 0-20N (NH rainfall is slightly lower at higher latitudes)
+
+Asymmetry index (NH-SH)/(NH+SH) basically mirrors NH-SH. There is little time-lagged correlation between tropical precipitation asymmetry index and NH-SH Net in the tropics, but the time-lagged correlation between tropical precipitation asymmetry index and NH-SH Net in the extratropics is higher.
+
+When tropical precipitation asymmetry leads the extratropical (20N-90N) net NH-SH by 8 months, then there is a correlation of 0.42 between the two indices.
+
+\end{document}
