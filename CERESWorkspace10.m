@@ -1,3 +1,6 @@
+
+%%accuray of LatWeight: (LatWeights(:,2)'-cosd(-89.5:89.5)/sum(cosd(-89.5:89.5)))./LatWeights(:,2)'
+
 load LatWeights.mat
 %zonal weights from http://ceres.larc.nasa.gov/data/zone_weights_lou.txt
 ncdisp('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc');

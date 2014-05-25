@@ -1,7 +1,7 @@
 function [MaxCorr, RealMonthOfMaxCorr, TimeLaggedCorr]= PlotFluxSidebySide(Flux1,Flux2,Name1,Name2,MonthFilterSize,PlotYesNo)
 time = length(Flux1);
 
-MaxLag = 20;
+MaxLag = 25;
 TimeLeadCorr = zeros(1,MaxLag);
 TimeLagCorr = zeros(1,MaxLag);
 

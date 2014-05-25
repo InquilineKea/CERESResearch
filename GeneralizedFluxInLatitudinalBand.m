@@ -1,10 +1,10 @@
-function [NH,SH,HemDif,HemSum,AsymmetryIndex] = FluxInLatitudinalBand(Flux,LowerLat,HigherLat,VariableName,MonthFilterSize)
+function [NH,SH,HemDif,HemSum,AsymmetryIndex] = GeneralizedFluxInLatitudinalBand(Flux,LowerLat,HigherLat,VariableName,MonthFilterSize,ListOfLats)
 hold off;
 %time = length(ncread('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','time'));
 time = length(Flux(1,1,:));
-load LatWeights.mat
-load IndicesMWA.mat
-lat = ncread('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','lat');
+% load LatWeights.mat
+ load IndicesMWA.mat
+% ListOfLats= ncread('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','lat');
 
 % difNHSH = zeros(1,time);
 % NH = zeros(1,time);
@@ -17,26 +17,26 @@ lat = ncread('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','lat');
 %also this reasoning can be applied if i just want to select land tiles,
 %too..
 
-LatWeightsAlone = LatWeights(:,2);
+LatWeightsAlone = cosd(ListOfLats)./sum(cosd(ListOfLats));
 
 for j=1:time
-    latFluxes = bsxfun(@rdivide,mean(Flux(:,:,j),2).*LatWeights(:,2),sum(LatWeightsAlone(LatWeights(:,1) <= HigherLat & LatWeights(:,1) > LowerLat)));
+    latFluxes = bsxfun(@rdivide,mean(Flux(:,:,j),2).*LatWeightsAlone,sum(LatWeightsAlone(ListOfLats <= HigherLat& ListOfLats > LowerLat)));
     %shoudln't this be sum rather than mean? when i do sum it gets into the
     %thousands... can't work..
     %mean(permuteNet(:,:,1:12:end),3) %march means...
-    AllFluxes.difNHSH(j) = sum(latFluxes(lat > LowerLat & lat <= HigherLat)-latFluxes(lat < -LowerLat & lat >= -HigherLat));
-    AllFluxes.NH(j) = sum(latFluxes(lat > LowerLat & lat <= HigherLat)); %sum across latitude lines
-    AllFluxes.SH(j) = sum(latFluxes(lat < -LowerLat & lat >= -HigherLat));
+    AllFluxes.difNHSH(j) = sum(latFluxes(ListOfLats > LowerLat& ListOfLats<= HigherLat)-latFluxes(ListOfLats< -LowerLat& ListOfLats>= -HigherLat));
+    AllFluxes.NH(j) = sum(latFluxes(ListOfLats> LowerLat& ListOfLats<= HigherLat)); %sum across latitude lines
+    AllFluxes.SH(j) = sum(latFluxes(ListOfLats< -LowerLat& ListOfLats>= -HigherLat));
 end
 
 for j=1:time
-    latFluxesGlobal = bsxfun(@rdivide,mean(Flux(:,:,j),2).*LatWeights(:,2),sum(LatWeightsAlone(LatWeights(:,1) <= 90 & LatWeights(:,1) > 0)));
+    latFluxesGlobal = bsxfun(@rdivide,mean(Flux(:,:,j),2).*LatWeightsAlone,sum(LatWeightsAlone(ListOfLats <= 90 & ListOfLats > 0)));
     %shoudln't this be sum rather than mean? when i do sum it gets into the
     %thousands... can't work..
     %mean(permuteNet(:,:,1:12:end),3) %march means...
-    AllFluxes.difNHSHGlobal(j) = sum(latFluxesGlobal(lat > 0 & lat <= 90)-latFluxesGlobal(lat < 0 & lat >= -90));
-    AllFluxes.NHGlobal(j) = sum(latFluxesGlobal(lat > 0 & lat <= 90)); %sum across latitude lines
-    AllFluxes.SHGlobal(j) = sum(latFluxesGlobal(lat < 0 & lat >= -90));
+    AllFluxes.difNHSHGlobal(j) = sum(latFluxesGlobal(ListOfLats> 0 & ListOfLats<= 90)-latFluxesGlobal(ListOfLats< 0 & ListOfLats>= -90));
+    AllFluxes.NHGlobal(j) = sum(latFluxesGlobal(ListOfLats> 0 & ListOfLats<= 90)); %sum across latitude lines
+    AllFluxes.SHGlobal(j) = sum(latFluxesGlobal(ListOfLats< 0 & ListOfLats>= -90));
 end
 
 AllFluxes.HemDif = AllFluxes.NH-AllFluxes.SH;
