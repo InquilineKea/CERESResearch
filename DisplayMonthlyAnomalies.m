@@ -27,8 +27,8 @@ RawFlux.SWCF = permute(SWCF,[2 1 3]);
 RawFlux.LWCF = permute(LWCF,[2 1 3]);
 RawFlux.SWclear = permute(rsdt-rsutcs,[2 1 3]);
 RawFlux.LWclear = permute(-rlutcs,[2 1 3]);
-RawFlux.NetClear = permute(netcs,[2 1 3]);
-RawFlux.NetCloud = RawFlux.SWCF + RawFlux.LWCF;
+RawFlux.Clear = permute(netcs,[2 1 3]);
+RawFlux.Cloud = RawFlux.SWCF + RawFlux.LWCF;
 clearvars net rsut rlut rsutcs rlutcs SWCF LWCF temp LW SW netcs rsdt
 
 temp = ncread('t2m.nc','t2m');

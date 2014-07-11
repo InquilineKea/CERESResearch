@@ -44,7 +44,7 @@ AllFluxes.HemSum = (AllFluxes.NH+AllFluxes.SH)/2; %does this average to zero??? 
 AllFluxes.AsymmetryIndex = AllFluxes.HemDif./(AllFluxes.HemSum*2);
 
 days_per_month = [31 28 31 30 31 30 31 31 30 31 30 31];
-allMonthWeights = repmat(days_per_month,1,12);
+allMonthWeights = repmat(days_per_month,1,13);
 allMonthWeights = [31 30 31 30 31 31 30 31 30 31 allMonthWeights 31 28];
 allMonthWeights(48) = 29; %leap year, http://www.wolframalpha.com/input/?i=months+between+march+2000+and+february+2004
 allMonthWeights(96) = 29;
@@ -90,9 +90,9 @@ else
         [AX,H1,H2] = plotyy(1:length(NH),[NH' SH' HemSum'],1:length(NH),HemDif);
 end
 grid on;
-set(gca,'xtick',12-2-(MonthFilterSize-1):12:time)
+set(gca,'xtick',12-2-(MonthFilterSize-1)-6:12:time)
 set(AX(2),'XTickLabel',[])
-set(gca,'XTickLabel',2000:2012)
+set(gca,'XTickLabel',2000:2013)
 
 
 if strcmp(VariableName,'Precip')

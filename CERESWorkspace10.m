@@ -3,12 +3,12 @@
 
 load LatWeights.mat
 %zonal weights from http://ceres.larc.nasa.gov/data/zone_weights_lou.txt
-ncdisp('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc');
-rlutcs = ncread('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','rlutcs');
-rsutcs = ncread('rsutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc', 'rsutcs');
-rsdt = ncread('rsdt_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','rsdt');
-rsut = ncread('rsut_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','rsut');
-rlut = ncread('rlut_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','rlut');
+% ncdisp('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc');
+rlutcs = ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc','toa_lw_clr_mon');
+rsutcs = ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc', 'toa_sw_clr_mon');
+rsdt = ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc','solar_mon');
+rsut = ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc','toa_sw_all_mon');
+rlut = ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc','toa_lw_all_mon');
 SW = rsdt-rsut;
 LW = -rlut;
 SWCF = rsutcs-rsut; %what about shortwave down forcing? since this is what clouds should reflect...
@@ -16,11 +16,11 @@ SWCF = rsutcs-rsut; %what about shortwave down forcing? since this is what cloud
 %reflected in clearsky..
 LWCF = rlutcs-rlut; 
 %rlutcs > rlut. more longwave up in clearsky
-netcs = rsdt - rsutcs - rlutcs; %isnt this just clear sky??
-net = rsdt - rsut - rlut;
-lat = ncread('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','lat');
-lon = ncread('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','lon');
-time = length(ncread('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','time'));
+netcs = ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc','toa_net_clr_mon');
+net = ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc','toa_net_all_mon');
+lat = ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc','lat');
+lon = ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc','lon');
+time = length(ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc','time'));
 RawFlux.Net = permute(net,[2 1 3]);
 RawFlux.SW = permute(SW,[2 1 3]);
 RawFlux.LW = permute(LW,[2 1 3]);
@@ -28,29 +28,29 @@ RawFlux.SWCF = permute(SWCF,[2 1 3]);
 RawFlux.LWCF = permute(LWCF,[2 1 3]);
 RawFlux.SWclear = permute(rsdt-rsutcs,[2 1 3]);
 RawFlux.LWclear = permute(-rlutcs,[2 1 3]);
-RawFlux.NetClear = permute(netcs,[2 1 3]);
-RawFlux.NetCloud = RawFlux.SWCF + RawFlux.LWCF;
+RawFlux.Clear = permute(netcs,[2 1 3]);
+RawFlux.Cloud = RawFlux.SWCF + RawFlux.LWCF;
 clearvars net rsut rlut rsutcs rlutcs SWCF LWCF temp LW SW netcs rsdt
-
-temp = ncread('t2m.nc','t2m');
-temptime = ncread('t2m.nc','time');
-tempLats= ncread('t2m.nc','latitude');
-tempLongs = ncread('t2m.nc','longitude');
-temp = temp(:,:,find(temptime==878016):find(temptime==991296));
-temp = permute(temp,[2 1 3]);
-E=zeros(180,360,156);
-for depth=1:size(temp,3)
-  temp(:,:,depth) = flipud(temp(:,:,depth));
-  E(:,:,depth)=imresize(temp(:,:,depth),[180 360]);
-end
-RawFlux.Temp = E;
-clear E;
+% 
+% temp = ncread('t2m.nc','t2m');
+% temptime = ncread('t2m.nc','time');
+% tempLats= ncread('t2m.nc','latitude');
+% tempLongs = ncread('t2m.nc','longitude');
+% temp = temp(:,:,find(temptime==878016):find(temptime==991296));
+% temp = permute(temp,[2 1 3]);
+% E=zeros(180,360,156);
+% for depth=1:size(temp,3)
+%   temp(:,:,depth) = flipud(temp(:,:,depth));
+%   E(:,:,depth)=imresize(temp(:,:,depth),[180 360]);
+% end
+% RawFlux.Temp = E;
+% clear E;
 precip = ncread('precip.mon.mean.nc','precip');
 lat = ncread('precip.mon.mean.nc','lat');
 long = ncread('precip.mon.mean.nc','lon');
 preciptime = ncread('precip.mon.mean.nc','time');
 precip = permute(precip,[2 1 3]);
-precip = precip(:,:,find(preciptime== 73108):find(preciptime== 77828));
+precip = precip(:,:,find(preciptime== 73108):find(preciptime== 78193));
 for depth=1:size(precip,3)
   precip(:,:,depth) = flipud(precip(:,:,depth));
 end
@@ -58,7 +58,7 @@ RawFlux.Precip = precip;
 clear precip;
 clearvars net rsut rlut rsutcs rlutcs SWCF LWCF temp LW SW netcs rsdt
 
-E=zeros(180,360,156);
+E=zeros(180,360,time);
 for depth=1:size(RawFlux.Precip,3)
   E(:,:,depth) = imresize(RawFlux.Precip(:,:,depth),[180 360]);
 end
@@ -72,51 +72,58 @@ FluxNames = fieldnames(RawFlux);
 % MonthFilterSize = 3; %or can be 6, 12
 % MovingAvg.(['Window',num2str(MonthFilterSize),'Months']).Net = MovingAverageFilterAllTiles(RawFlux.Net,'Net',3);
 
-for MonthFilterSize =[3,6,12]
+MonthFilterSize = 12;
+% for MonthFilterSize =[3,6,12]
     for i=1:length(FluxNames)
 MovingAvg.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}) = MovingAverageFilterAllTiles(RawFlux.(FluxNames{i}),(FluxNames{i}),MonthFilterSize);
     end
-end
+% end
 clear RawFlux;
 
+%%%%CHANGE THIS
 
 set(gca,'FontSize',20)
-plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.Net,2)),0,2),'LineWidth',3)
+[AX,H1,H2] = plotyy(sind(LatWeights(:,1)),[std(squeeze(mean(MovingAvg.Window12Months.Net,2)),0,2) std(squeeze(mean(MovingAvg.Window12Months.LW,2)),0,2)...
+    std(squeeze(mean(MovingAvg.Window12Months.SW,2)),0,2)],sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.Precip,2)),0,2))
 hold on;
-plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.LW,2)),0,2),'LineWidth',3,'Color','r')
-plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.SW,2)),0,2),'LineWidth',3,'Color','g')
+% plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.LW,2)),0,2),'LineWidth',3,'Color','r')
+% plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.SW,2)),0,2),'LineWidth',3,'Color','g')
+% plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.Precip,2)),0,2),'LineWidth',3,'Color','m')
 %std of latitudinal averaged flux over time. this is prolly preferable
 grid on;
 % set(gca,'xtick',(0.5-90:10:179.5-90))
 set(gca,'xtick',sind((0.5:10*180/180:179.5)-90))
+	set(AX(2),'XTickLabel',[],'xtick',[])
+    set(H1,'LineWidth',3);set(H2,'LineWidth',3)
+    set(AX(2),'FontSize',20)
 set(gca,'xticklabel',num2cell(-90:10:80))
 xlabel('Latitude')
-ylabel('Temporal SD')
-title('Latitudinal SD of each flux (12-month MA)')
+ylabel('Temporal Radiative SD (W/m^2)')
+% title('Latitudinal SD of each flux (12-month MA)')
 view(90,-90)
-legend('Net','LW','SW')
+legend('Net','LW','SW','Precip')
 set(gca,'GridLineStyle','--')
 set(gcf,'paperposition',[0 0 20 10])
-print(gcf,'-dpng','-r300','LatVarNetLWSW.png')
+print(gcf,'-dpng','-r300','LatVarNetLWSWPrecip.png')
 
 set(gca,'FontSize',20)
 plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.Net,2)),0,2),'LineWidth',3)
 hold on;
-plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.NetClear,2)),0,2),'LineWidth',3,'Color','c')
-plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.NetCloud,2)),0,2),'LineWidth',3,'Color','m')
-legend('Net','NetClear','NetCloud')
+plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.Clear,2)),0,2),'LineWidth',3,'Color','c')
+plot(sind(LatWeights(:,1)),std(squeeze(mean(MovingAvg.Window12Months.Cloud,2)),0,2),'LineWidth',3,'Color','m')
+legend('Net','Clear','Cloud')
 grid on;
 % set(gca,'xtick',(0.5-90:10:179.5-90))
 set(gca,'xtick',sind((0.5:10*180/180:179.5)-90))
 set(gca,'xticklabel',num2cell(-90:10:80))
-title('Latitudinal SD of each flux (12-month MA)')
+% title('Latitudinal SD of each flux (12-month MA)')
 xlabel('Latitude')
 ylabel('Temporal SD')
 view(90,-90)
 set(gca,'GridLineStyle','--')
 set(gcf,'paperposition',[0 0 20 10])
-legend('Net','NetClear','NetCloud')
-print(gcf,'-dpng','-r300','LatVarNetNetClearNetCloud.png')
+legend('Net','Clear','Cloud')
+print(gcf,'-dpng','-r300','LatVarNetClearCloud.png')
 
 
 
@@ -130,6 +137,8 @@ a = open('blah.fig')
 for MonthFilterSize=[3,6,12]
 IndicesMvgAvg.(['Window',num2str(MonthFilterSize),'Months']) = IndexMovingAverage(MonthFilterSize);
 end
+save('IndicesMWA.mat','IndicesMvgAvg')
+
 SampleWindow = fieldnames(IndicesMvgAvg);
 IndexNames = fieldnames(IndicesMvgAvg.(SampleWindow{1}));
 
@@ -186,7 +195,7 @@ plot(MovingAvgTimeSeries.Window12Months.Precip.Global0to90)
 hold on;
 plot(MovingAvgTimeSeries.Window12Months.Precip.HemDif0to90,'r')
 
-for MonthFilterSize=[3,6]
+% for MonthFilterSize=[3,6]
     for i=1:size(FluxNames)
     [MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).NH0to90,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).SH0to90,...
     MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).HemDif0to90,MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}).Global0to90,...
@@ -226,7 +235,87 @@ for MonthFilterSize=[3,6]
     %= FluxInLatitudinalBand(MovingAvg.(['Window',num2str(MonthFilterSize),'Months']).(FluxNames{i}),rad2deg(asin(k*0.25)),rad2deg(asin((k+1)*0.25)),FluxNames{i},MonthFilterSize);
     end
     end
+% end
+
+load('2014-07-03.mat')
+
+ [p,S] = polyfit(1:157,MovingAvgTimeSeries.Window12Months.SWCF.Global0to90,1)
+ [a,b] = polyconf(p,MovingAvgTimeSeries.Window12Months.SWCF.Global0to90,S) %95% prediction intervals for each of 157 units of timeseries
+ polyval(p,MovingAvgTimeSeries.Window12Months.SWCF.Global0to90,S)
+ 
+ polyfit(1:157,MovingAvgTimeSeries.Window12Months.SWCF.Global0to90,1)*157
+ 
+ [a,b,stats] = glmfit(1:157,MovingAvgTimeSeries.Window12Months.Net.HemDif0to90)
+ stats.p %is this stat sig..? The actual crrln is only -0.166 ..
+%  corr(MovingAvgTimeSeries.Window12Months.Net.HemDif0to90',[1:157]')
+ 
+tempBlah = regstats(MovingAvgTimeSeries.Window12Months.Net.HemDif0to90',[1:157]','linear',{'all'})
+tempBlah.tstat.pval
+
+tempBlah = regstats(MovingAvgTimeSeries.Window12Months.Net.HemDif49to90',[1:157]','linear',{'beta','tstat'})
+tempBlah.tstat.pval
+
+tempBlah = regstats(MovingAvgTimeSeries.Window12Months.Net.HemDif0to14',[1:157]','linear',{'beta','tstat'})
+tempBlah.tstat.pval
+
+tempBlah = regstats(MovingAvgTimeSeries.Window12Months.LWclear.Global0to90',[1:157]','linear',{'beta','tstat'})
+tempBlah.tstat.pval
+tempBlah = regstats(MovingAvgTimeSeries.Window12Months.LWclear.NH49to90',[1:157]','linear',{'beta','tstat'})
+tempBlah.tstat.pval
+
+blah = FluxInLatitudinalBand(RawFlux.SWclear,75,90,'SWclear',12,0);
+blahblahStats = regstats(blah,[1:length(blah)]','linear','beta');
+blahblahStats.beta
+
+%from 75 to 90 (with zero averaging), this has a beta of -0.0397, which is -0.397 W/m^2...
+%0.044 with 1-month moving averages and subtracting out the climatology..
+%beta changes to 0.0504 once you do 12-month MAs... though this owuld make
+%more sense given the positive trend...
+
+%%%%NEED TO MULTIPLY ALL BETAS BY 12!!! B/C OF MONTHS!! SO BY 120 FOR
+%%%%DECADE TRENDS!
+
+
+% corr(MovingAvgTimeSeries.Window12Months.Net.NH14to30',MovingAvgTimeSeries.Window12Months.Net.HemDif14to30')
+TempField = orderfields(MovingAvgTimeSeries.Window12Months.Net);
+FluxBandNames = fieldnames(TempField);
+% Index1=regexp(FluxBandNames,'(N|S)H(.*)14');
+% Index2=regexp(FluxBandNames,'(N|S)H(.*)49');
+% Index = find(not(cellfun('isempty', Index1)) |  not(cellfun('isempty', Index2)) );
+% Lats2Plot = FluxBandNames(Index);
+% corr(TempField.(FluxBandNames{i})',MovingAvgTimeSeries.Window12Months.Net.HemDif0to90')
+% orderfields(Lats2Plot,struct('SH49to90',1,'SH30to49',1,'SH14to30',1,'SH0to14',1,'NH0to14',1,'NH14to30',1,'NH30to49',1,'NH49to90',1))
+    
+Lats2Plot2={'SH49to90'
+    'SH30to49'
+    'SH14to30'
+    'SH0to14'
+    'NH0to14'
+    'NH14to30'
+    'NH30to49'
+    'NH49to90'};
+
+LatCorr = zeros(length(Lats2Plot2),1);
+pval = LatCorr;
+for i=1:length(Lats2Plot2)
+    LatCorr(i)=corr(TempField.(Lats2Plot2{i})',MovingAvgTimeSeries.Window12Months.Net.HemDif0to90');
+    tempRegr = regstats(TempField.(Lats2Plot2{i})',MovingAvgTimeSeries.Window12Months.Net.HemDif0to90','linear',{'beta','tstat'})
+    pval(i) = tempRegr.tstat.pval(2);
 end
+
+set(gca,'FontSize',20)
+plot(LatCorr,'LineWidth',3)
+xlabel('Latitude')
+ylabel('Correlation with Net NH-SH')
+grid on;
+set(gca,'XTickLabel',Lats2Plot2)
+set(gca,'GridLineStyle','--')
+set(gcf,'paperposition',[0 0 20 10])
+print(gcf,'-dpng','-r300',['NetCorrsWithLatBands', '.png']);
+
+
+
+%%%
 
 PlotFluxSidebySide(MovingAvgTimeSeries.Window12Months.Precip.AsymIndex0to30,MovingAvgTimeSeries.Window12Months.Net.HemDif30to90,'PrecipAsym0to30','NetHemDif30to90',12)
 
@@ -273,7 +362,7 @@ FluxTupleSelections{2} = {'LW';'LWclear';'LWCF'};
 
 FluxTupleSelections{1} = {'SWclear';'LWclear';'SWCF';'LWCF';'Net'};
 
-FluxTupleSelections{1} = {'Temp';'Precip';'NetClear';'NetCloud';'Net'};
+FluxTupleSelections{1} = {'Temp';'Precip';'Clear';'Cloud';'Net'};
 for jj = 1:length(FluxTupleSelections)
 SubsetFluxIndices = [];
 for i = 1:length(FluxTupleSelections{jj})
@@ -295,7 +384,7 @@ clearvars SubsetFlux SubsetFluxNames SubsetFluxIndices
 end
 
 
-PlotLatRSquared(MovingAvg.(['Window',num2str(MonthFilterSize),'Months']),MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).NetClear,FluxNames,MonthFilterSize,'NetClear')
+PlotLatRSquared(MovingAvg.(['Window',num2str(MonthFilterSize),'Months']),MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).Clear,FluxNames,MonthFilterSize,'Clear')
 PlotLatRSquared(MovingAvg.(['Window',num2str(MonthFilterSize),'Months']),MovingAvgTimeSeries.(['Window',num2str(MonthFilterSize),'Months']).Temp,FluxNames,MonthFilterSize,'Temperature')
 
 
@@ -367,18 +456,18 @@ end
 
 
 
-%end 2014-05-05
+%ENDDAY
 
 
 %%%%%%%%%
 
 % %%%%
-% NetClearCloudNames = {'Net','NetClear','NetCloud'};
+% ClearCloudNames = {'Net','Clear','Cloud'};
 % for i = 1:3
-%    NetClearCloud.(NetClearCloudNames{i}) = MovingAvg.(['Window',num2str(MonthFilterSize),'Months']).(NetClearCloudNames{i});
+%    ClearCloud.(ClearCloudNames{i}) = MovingAvg.(['Window',num2str(MonthFilterSize),'Months']).(ClearCloudNames{i});
 % end
 % 
-% PlotLatRSquared(NetClearCloud,IndicesMvgAvg.(['Window',num2str(MonthFilterSize),'Months']),fieldnames(NetClearCloud),MonthFilterSize,[''])
+% PlotLatRSquared(ClearCloud,IndicesMvgAvg.(['Window',num2str(MonthFilterSize),'Months']),fieldnames(ClearCloud),MonthFilterSize,[''])
 
     
 for MonthFilterSize=[3,6]
@@ -524,8 +613,8 @@ end
 % SubsetFluxIndices = find(strcmp('LW',FluxNames) | strcmp('LWclear',FluxNames) | strcmp('LWCF',FluxNames));
 % SubsetFluxIndices = find(strcmp('SW',FluxNames) | strcmp('SWclear',FluxNames) | strcmp('SWCF',FluxNames));
 % 
-% SubsetFluxIndices = find(strcmp('NetCloud',FluxNames) | strcmp('SWCF',FluxNames) | strcmp('LWCF',FluxNames));
-% SubsetFluxIndices = find(strcmp('NetClear',FluxNames) | strcmp('SWclear',FluxNames) | strcmp('LWclear',FluxNames));
+% SubsetFluxIndices = find(strcmp('Cloud',FluxNames) | strcmp('SWCF',FluxNames) | strcmp('LWCF',FluxNames));
+% SubsetFluxIndices = find(strcmp('Clear',FluxNames) | strcmp('SWclear',FluxNames) | strcmp('LWclear',FluxNames));
 % 
 % SubsetFluxIndices = find(strcmp('Net',FluxNames) | strcmp('SW',FluxNames) | strcmp('LW',FluxNames)| strcmp('LWCF',FluxNames));
 % SubsetFluxIndices = find(strcmp('Net',FluxNames) | strcmp('SWCF',FluxNames) | strcmp('Precip',FluxNames)| strcmp('LWCF',FluxNames));

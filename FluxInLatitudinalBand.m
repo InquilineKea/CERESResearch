@@ -1,10 +1,11 @@
-function [NH,SH,HemDif,HemSum,AsymmetryIndex] = FluxInLatitudinalBand(Flux,LowerLat,HigherLat,VariableName,MonthFilterSize)
+function [NH,SH,HemDif,HemSum,AsymmetryIndex] = FluxInLatitudinalBand(Flux,LowerLat,HigherLat,VariableName,MonthFilterSize,Extras)
 hold off;
 %time = length(ncread('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','time'));
 time = length(Flux(1,1,:));
 load LatWeights.mat
 load IndicesMWA.mat
-lat = ncread('rlutcs_CERES-EBAF_L3B_Ed2-7_200003-201302.nc','lat');
+% IndicesMvgAvg = IndicesMWA;
+lat = ncread('CERES_EBAF-TOA_Ed2.8_Subset_200003-201402.nc','lat');
 
 % difNHSH = zeros(1,time);
 % NH = zeros(1,time);
@@ -44,18 +45,47 @@ AllFluxes.HemSum = (AllFluxes.NH+AllFluxes.SH)/2; %does this average to zero??? 
 AllFluxes.AsymmetryIndex = AllFluxes.HemDif./(AllFluxes.HemSum*2);
 
 days_per_month = [31 28 31 30 31 30 31 31 30 31 30 31];
-allMonthWeights = repmat(days_per_month,1,12);
+allMonthWeights = repmat(days_per_month,1,13);
 allMonthWeights = [31 30 31 30 31 31 30 31 30 31 allMonthWeights 31 28];
 allMonthWeights(48) = 29; %leap year, http://www.wolframalpha.com/input/?i=months+between+march+2000+and+february+2004
 allMonthWeights(96) = 29;
 moving_sum = @(n, x) filter(ones(1,n), 1, x);
 
+
+
+
+NumMonthsAfterMAFiltering = time-(MonthFilterSize-1);
+NumMonthsAfterMAFiltering
+
+%%%
+
 AllFluxNames = fieldnames(AllFluxes);
 for i=1:length(AllFluxNames)
-AllFluxes.(AllFluxNames{i}) = ...
-    bsxfun(@rdivide,moving_sum(MonthFilterSize, AllFluxes.(AllFluxNames{i}) .* allMonthWeights),moving_sum(MonthFilterSize,allMonthWeights)); AllFluxes.(AllFluxNames{i}) = AllFluxes.(AllFluxNames{i})(MonthFilterSize:end);
-Mean.(AllFluxNames{i}) = mean(AllFluxes.(AllFluxNames{i}));
+MovingAverage = ...
+    bsxfun(@rdivide,moving_sum(MonthFilterSize, AllFluxes.(AllFluxNames{i}) .* allMonthWeights), ...
+    moving_sum(MonthFilterSize,allMonthWeights)); AllFluxes.(AllFluxNames{i}) = AllFluxes.(AllFluxNames{i})(MonthFilterSize:end);
+% AllFluxes.(AllFluxNames{i}) = MovingAverage;
+length(MovingAverage)
+%%something is deeply deeply fucked with code below..
+
+for j=1:NumMonthsAfterMAFiltering
+    Indices = mod(j,12):12:NumMonthsAfterMAFiltering;
+    if mod(j,12)==0
+        Indices = 12:12:NumMonthsAfterMAFiltering;
+    end
+    AllFluxes.(AllFluxNames{i})(j) = MovingAverage(j) - mean(MovingAverage(Indices));
 end
+
+
+end
+
+%%%NEWLY ADDED
+
+% FluxDeparture = zeros(180,360,NumMonthsAfterMAFiltering);
+%Flux = LWclear;
+
+
+
 % AsymmetryIndex= bsxfun(@rdivide,moving_sum(MonthFilterSize, AsymmetryIndex .* allMonthWeights),moving_sum(MonthFilterSize,allMonthWeights)); AsymmetryIndex = AsymmetryIndex(MonthFilterSize:end);
 % NH= bsxfun(@rdivide,moving_sum(MonthFilterSize, NH .* allMonthWeights),moving_sum(MonthFilterSize,allMonthWeights)); NH = NH(MonthFilterSize:end);
 % SH= bsxfun(@rdivide,moving_sum(MonthFilterSize, SH .* allMonthWeights),moving_sum(MonthFilterSize,allMonthWeights)); SH = SH(MonthFilterSize:end);
@@ -90,42 +120,57 @@ else
         [AX,H1,H2] = plotyy(1:length(NH),[NH' SH' HemSum'],1:length(NH),HemDif);
 end
 grid on;
-set(gca,'xtick',12-2-(MonthFilterSize-1):12:time)
+set(gca,'xtick',12-2-(MonthFilterSize-1)-6:12:time)
 set(AX(2),'XTickLabel',[])
-set(gca,'XTickLabel',2000:2012)
+set(gca,'XTickLabel',2000:2013)
 
 
 if strcmp(VariableName,'Precip')
-set(get(AX(1),'Ylabel'),'FontSize',20,'String','Precip in Latitude Band for NH, SH (mm/day)') 
-set(get(AX(2),'Ylabel'),'FontSize',20,'String','NH-SH Difference in Precip','FontSize',20) 
+set(get(AX(1),'Ylabel'),'FontSize',20,'String','Precip for NH, SH, global (mm/day)') 
+set(get(AX(2),'Ylabel'),'FontSize',20,'String','Precip for NH-SH (mm/day)','FontSize',20) 
 % 'fadad'
 else
-set(get(AX(1),'Ylabel'),'FontSize',20,'String','Heat Flux in Latitude Band for NH, SH (Watts/m^2)') 
-set(get(AX(2),'Ylabel'),'FontSize',20,'String','NH-SH Difference in Total Heat Flux (Watts/m^2)','FontSize',20) 
+set(get(AX(1),'Ylabel'),'FontSize',20,'String','Energy Flux for NH, SH, global (W/m^2)') 
+set(get(AX(2),'Ylabel'),'FontSize',20,'String','Energy Flux for NH-SH (W/m^2)','FontSize',20) 
 % 'SHOULD WORK'
 end
 difSD = sqrt(var(NH) + var(SH) - 2*getfield(cov(NH,SH), {1,2}));
 GlobalSD = sqrt(var(NH) + var(SH) +2*getfield(cov(NH,SH), {1,2}));
 corrcof = getfield(corrcoef(NH,SH),{1,2});
+% if strcmp(VariableName,'Precip')
+%         set(legend(['NH \mu = ', num2str(NHMean)],['SH \mu = ', num2str(SHMean)] ,['Global \mu = ' num2str(GlobalMean)], ['AsymIndex'],['NH-SH \mu = ', num2str(HemDifMean)]),'Location','BestOutside')
+% else
+%     set(legend(['NH \mu = ', num2str(NHMean)],['SH \mu = ', num2str(SHMean)] ,['Global \mu = ' num2str(GlobalMean)],sprintf(['NH-SH \\mu = ', num2str(HemDifMean), '\n Corr = ', num2str(corrcof)])),'Location','BestOutside')    
+% end
 if strcmp(VariableName,'Precip')
-        set(legend(['NH \mu = ', num2str(NHMean)],['SH \mu = ', num2str(SHMean)] ,['Global \mu = ' num2str(GlobalMean)], ['AsymIndex'],['NH-SH \mu = ', num2str(HemDifMean)]),'Location','BestOutside')
+        set(legend(['NH \mu = ', num2str(round(NHMean*1e2)/1e2)],['SH \mu = ', num2str(round(SHMean*1e2)/1e2)] ,['Global \mu = ' num2str(round(GlobalMean*1e2)/1e2)], ['AsymIndex'],['NH-SH \mu = ', num2str(round(HemDifMean*1e2)/1e2)]),'Location','Northeast')
 else
-    set(legend(['NH \mu = ', num2str(NHMean)],['SH \mu = ', num2str(SHMean)] ,['Global \mu = ' num2str(GlobalMean)],sprintf(['NH-SH \\mu = ', num2str(HemDifMean), '\n Corr = ', num2str(corrcof)])),'Location','BestOutside')    
+    set(legend(['NH \mu = ', num2str(round(NHMean*1e2)/1e2)],['SH \mu = ', num2str(round(SHMean*1e2)/1e2)] ,['Global \mu = ' num2str(round(GlobalMean*1e2)/1e2)],sprintf(['NH-SH \\mu = ', num2str(round(HemDifMean*1e2)/1e2), '\n Corr = ', num2str(round(corrcof*1e2)/1e2)])),'Location','Northeast')    
 end
+
 set(H1,'linewidth',4)
 set(H2,'LineStyle','--')
 set(H2,'linewidth',3)% to change the first line
 set(AX,'FontSize',20)
-xlabel('Year End');
+xlabel('Predominant Year');
 uistack(H1(3), 'top') 
 set(gcf, 'Units','inches', 'Position',[0 0 20 10])
 set(gca, 'Units','inches', 'Position',[1 1 16 8])
-title([num2str(LowerLat),'-',num2str(HigherLat),'deg ', num2str(MonthFilterSize),' Month Moving Avg ', VariableName, '. NH/SH ',sprintf(['Corr = ', num2str(corrcof)])])
+% title([num2str(LowerLat),'-',num2str(HigherLat),'deg ', num2str(MonthFilterSize),' Month Moving Avg ', VariableName, '. NH/SH ',sprintf(['Corr = ', num2str(corrcof)])])
+
+if LowerLat == 0 && HigherLat == 90
+title([VariableName, ' Hemispheric Radiation'])
+else
+title([num2str(LowerLat),'-',num2str(HigherLat),'deg ', VariableName,' Hemispheric Radiation'])
+end
+
 set(gca,'GridLineStyle','--')
 set(gcf,'paperposition',[0 0 20 10])
 print(gcf,'-dpng','-r300',[VariableName, num2str(MonthFilterSize),'MonthMA_HemisphericDifs_',num2str(LowerLat),'-',num2str(HigherLat),'.png']);
 saveas(gcf,[VariableName, num2str(MonthFilterSize),'MonthMA_HemisphericDifs_',num2str(LowerLat),'-',num2str(HigherLat),'.fig'],'fig')
 hold off;
+
+if Extras == 1
 
 FluxFile = [VariableName, num2str(MonthFilterSize), '_MonthMA_', num2str(LowerLat), '_', num2str(HigherLat),'.txt'];
 
@@ -158,7 +203,7 @@ end
     
 fprintf(fid, '**************************\n');
 fclose(fid);
-
+end
 % fprintf(fid, '%s\n',[VariableName, ' NH vs. NAM Corr = ', num2str(  getfield(corrcoef(NH,IndicesMvgAvg.Window12Months.NAM)  ,{1,2}))]);
 % fprintf(fid, '%s\n',[VariableName, ' NH vs. SAM Corr = ', num2str(  getfield(corrcoef(NH,IndicesMvgAvg.Window12Months.SAM)  ,{1,2}))]);
 % fprintf(fid, '%s\n',[VariableName, ' NH vs. NINO34 Corr = ', num2str(  getfield(corrcoef(NH,IndicesMvgAvg.Window12Months.NINO34)  ,{1,2}))]);

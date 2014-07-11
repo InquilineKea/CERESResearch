@@ -1,4 +1,4 @@
-function [MaxCorr, RealMonthOfMaxCorr, TimeLaggedCorr]= PlotFluxSidebySide(Flux1,Flux2,Name1,Name2,MonthFilterSize,PlotYesNo)
+function [MaxCorr, RealMonthOfMaxCorr, TimeLaggedCorr, TimeLaggedPVals]= PlotFluxSidebySide(Flux1,Flux2,Name1,Name2,MonthFilterSize,PlotYesNo)
 time = length(Flux1);
 
 MaxLag = 25;
@@ -7,16 +7,24 @@ TimeLagCorr = zeros(1,MaxLag);
 
 for i=1:MaxLag
     TimeLeadCorr(i) = corr(Flux1(1:end-i)',Flux2(i+1:end)');
-    TimeLeadRSq(i) = RSquared(Flux1(1:end-i)',Flux2(i+1:end)');
+     Stats = regstats(Flux1(1:end-i)',Flux2(i+1:end)','linear','all');
+    TimeLeadPVal(i) = Stats.tstat.pval(2);
+%     TimeLeadRSq(i) = RSquared(Flux1(1:end-i)',Flux2(i+1:end)');
     TimeLagCorr(i)=corr(Flux1(i+1:end)',Flux2(1:end-i)');
-    TimeLagRSq(i)=RSquared(Flux1(i+1:end)',Flux2(1:end-i)');
+         Stats = regstats(Flux1(i+1:end)',Flux2(1:end-i)','linear','all');
+    TimeLagPVal(i) = Stats.tstat.pval(2);
+%     TimeLagRSq(i)=RSquared(Flux1(i+1:end)',Flux2(1:end-i)');
 end
 TimeLeadCorr = fliplr(TimeLeadCorr);
+TimeLeadPVal = fliplr(TimeLeadPVal);
 tempCorr = corr(Flux1',Flux2');
-tempRSq = RSquared(Flux1',Flux2');
+Stats = regstats(Flux1',Flux2','linear','all');
+CenterPVal = Stats.tstat.pval(2);
+% tempRSq = RSquared(Flux1',Flux2');
 
 TimeLaggedCorr = [TimeLeadCorr tempCorr TimeLagCorr];
-TimeLaggedRSq = [TimeLeadRSq tempRSq TimeLagRSq];
+TimeLaggedPVals = [TimeLeadPVal CenterPVal TimeLagPVal];
+% TimeLaggedRSq = [TimeLeadRSq tempRSq TimeLagRSq];
 
 % TimeLaggedCorr(MaxLag+1)
 MonthsBeforeAfter = [-MaxLag:MaxLag];
